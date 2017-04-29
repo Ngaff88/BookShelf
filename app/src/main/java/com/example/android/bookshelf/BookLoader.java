@@ -10,7 +10,7 @@ import java.util.List;
  * Created by Nicholas on 4/21/2017.
  */
 
-public class BookLoader extends AsyncTaskLoader<List<Books>>{
+class BookLoader extends AsyncTaskLoader<List<Books>>{
     /** Tag for log messages */
     private static final String LOG_TAG = BookLoader.class.getName();
 
@@ -23,7 +23,7 @@ public class BookLoader extends AsyncTaskLoader<List<Books>>{
      * @param context of the activity
      * @param url to load data from
      */
-    public BookLoader(Context context, String url) {
+    BookLoader(Context context, String url) {
         super(context);
         mUrl = url;
 

@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * Created by Nicholas on 4/21/2017.
  */
 
-public class BookAdapter extends ArrayAdapter<Books> {
+class BookAdapter extends ArrayAdapter<Books> {
     private static final String LOG_TAG = BookAdapter.class.getSimpleName();
 
     private static final String LOCATION_SEPARATOR = " of ";
@@ -53,9 +53,13 @@ public class BookAdapter extends ArrayAdapter<Books> {
                     R.layout.list_item, parent, false);
         }
 
-        // Get the {@link AndroidFlavor} object located at this position in the list
+        // Get the {@link Books} object located at this position in the list
         Books currentBook = getItem(position);
 
+        TextView rateTextView = (TextView) listItemView.findViewById(R.id.rating);
+        DecimalFormat formatter = new DecimalFormat("0.0");
+        String output = formatter.format(currentBook.getRating());
+        rateTextView.setText(String.valueOf(output));
 
         String author = currentBook.getAuthor();
         TextView authorTextView = (TextView) listItemView.findViewById(R.id.author);
@@ -65,6 +69,7 @@ public class BookAdapter extends ArrayAdapter<Books> {
         String title = currentBook.getTitle();
         TextView titleTextView = (TextView) listItemView.findViewById(R.id.title);
         titleTextView.setText(title);
+
 
 
         // Return the whole list item layout (containing 2 TextViews and an ImageView)

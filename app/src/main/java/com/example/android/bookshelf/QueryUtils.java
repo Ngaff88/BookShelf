@@ -99,6 +99,9 @@ public class QueryUtils {
         // Create an empty ArrayList that we can start adding books to
         List<Books> books = new ArrayList<>();
 
+
+        // If the results are not null proceed to parsing and creating Book Objects
+        // Convert the results from String to JSONObject
         // Try to parse the JSON response string. If there's a problem with the way the JSON
         // is formatted, a JSONException exception object will be thrown.
         // Catch the exception so the app doesn't crash, and print the error message to the logs.
@@ -122,6 +125,8 @@ public class QueryUtils {
                 // for that book.
                 JSONObject properties = currentBook.getJSONObject("volumeInfo");
 
+                double rating = properties.getDouble("averageRating");
+                Log.d(LOG_TAG,"grabbed Rating");
 
                 // Extract the value for the key called "title"
                 String title = properties.getString("title");
@@ -131,12 +136,11 @@ public class QueryUtils {
                 String author = properties.getString("authors");
                 Log.d(LOG_TAG,"grabbed author");
 
-                // Extract the value for the key called "url"
-                String url = properties.getString("selfLink");
-                Log.d(LOG_TAG,"grabbed url");
+
+
 
                 // Create a new {@link Books} object with the title, authors and url from the JSON response.
-                Books bookItems = new Books(title, author, url);
+                Books bookItems = new Books(title, author, rating);
 
                 // Add the new {@link Books} to the list of books.
                 books.add(bookItems);

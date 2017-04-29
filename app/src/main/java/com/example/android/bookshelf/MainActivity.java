@@ -3,27 +3,30 @@ package com.example.android.bookshelf;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
+
 public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<List<Books>> {
 
+    callSearch searching = new callSearch();
+
+
     private static final int BOOK_LOADER_ID = 1;
-    private static final String USGS_REQUEST_URL = "https://www.google.com/search?tbm=bks&q=Bishop";
+    private static final String USGS_REQUEST_URL ="https://www.googleapis.com/books/v1/volumes?q=android&maxResults=10";
+
     public static final String LOG_TAG = MainActivity.class.getName();
     private BookAdapter mAdapter;
 
@@ -31,6 +34,8 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
      * Constant value for the books loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
      */
+
+
 
     /** TextView that is displayed when the list is empty */
     private TextView mEmptyStateTextView;
@@ -40,7 +45,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
     public Loader<List<Books>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.v(LOG_TAG,"TEST: Create Loader Called");
-        return new BookLoader(this, USGS_REQUEST_URL);
+        return new BookLoader(this, URL);
     }
     @Override
     public void onLoadFinished(Loader<List<Books>> loader, List<Books> books) {
@@ -48,11 +53,7 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
         progressBar.setVisibility(View.GONE);
 
 
-        // Set empty state text to display "No books found."
-        mEmptyStateTextView.setText(R.string.no_books);
-        Log.v(LOG_TAG,"TEST: Finished Loader Called");
-        // Clear the adapter of previous book data
-        books.clear();
+
 
 
         // If there is a valid list of {@link Books}s, then add them to the adapter's
@@ -60,6 +61,15 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
         if (books != null && !books.isEmpty()) {
             mAdapter.addAll(books);
         }
+        // Set empty state text to display "No books found."
+        mEmptyStateTextView.setText(R.string.no_books);
+        Log.v(LOG_TAG,"TEST: Finished Loader Called");
+        // Clear the adapter of previous book data
+        if (books != null) {
+            books.clear();
+        }
+
+
     }
     @Override
     public void onLoaderReset(Loader<List<Books>> loader) {
@@ -69,10 +79,12 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
 
         // Find a reference to the {@link ListView} in the layout
@@ -85,24 +97,6 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
         // so the list can be populated in the user interface
         bookListView.setAdapter(mAdapter);
 
-        // Set an item click listener on the ListView, which sends an intent to a web browser
-        // to open a website with more information about the selected book.
-        bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // Find the current book that was clicked on
-                Books currentBook = mAdapter.getItem(position);
-
-                // Convert the String URL into a URI object (to pass into the Intent constructor)
-                Uri bookUri = Uri.parse(currentBook.getUrl());
-
-                // Create a new intent to view the books URI
-                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, bookUri);
-
-                // Send the intent to launch a new activity
-                startActivity(websiteIntent);
-            }
-        });
 
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
         bookListView.setEmptyView(mEmptyStateTextView);
