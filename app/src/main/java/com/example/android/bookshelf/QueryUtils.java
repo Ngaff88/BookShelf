@@ -2,9 +2,11 @@ package com.example.android.bookshelf;
 
 import android.text.TextUtils;
 import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
 import static com.example.android.bookshelf.MainActivity.LOG_TAG;
 
 /**
@@ -72,6 +75,7 @@ public class QueryUtils {
         }
         return jsonResponse;
     }
+
     private static String readFromStream(InputStream inputStream) throws IOException {
         StringBuilder output = new StringBuilder();
         if (inputStream != null) {
@@ -128,21 +132,40 @@ public class QueryUtils {
 
                 // Extract the value for the key called "title"
                 String title = properties.getString("title");
-                Log.d(LOG_TAG,"grabbed title");
-
+                Log.d(LOG_TAG, "grabbed title");
                 // Extract the value for the key called "authors"
-                String author = properties.getString("authors");
-                Log.d(LOG_TAG,"grabbed author");
-
-
-
+                JSONArray bookAuthors = null;
+                try {
+                    bookAuthors = properties.getJSONArray("authors");
+                } catch (JSONException ignored) {
+                }
+                // Convert the authors to a string
+                String bookAuthorsString = "";
+                // If the author is empty, set it as "Unknown"
+                if (bookAuthors == null) {
+                    bookAuthorsString = "Unknown Author";
+                } else {
+                    // Format the authors as "author1, author2, and author3"
+                    int countAuthors = bookAuthors.length();
+                    for (int e = 0; e < countAuthors; e++) {
+                        String author = bookAuthors.getString(e);
+                        if (bookAuthorsString.isEmpty()) {
+                            bookAuthorsString = author;
+                        } else if (e == countAuthors - 1) {
+                            bookAuthorsString = bookAuthorsString + " and " + author;
+                        } else {
+                            bookAuthorsString = bookAuthorsString + ", " + author;
+                        }
+                    }
+                }
+                Log.d(LOG_TAG, "grabbed author");
 
                 // Create a new {@link Books} object with the title, authors and url from the JSON response.
-                Books bookItems = new Books(title, author);
+                Books bookItems = new Books(title, bookAuthorsString);
 
                 // Add the new {@link Books} to the list of books.
                 books.add(bookItems);
-                Log.d(LOG_TAG,"books added");
+                Log.d(LOG_TAG, "books added");
             }
 
         } catch (JSONException e) {
@@ -162,7 +185,7 @@ public class QueryUtils {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Log.v(LOG_TAG,"TEST: Fetch Method Called");
+        Log.v(LOG_TAG, "TEST: Fetch Method Called");
         // Create URL object
         URL url = createUrl(requestUrl);
 

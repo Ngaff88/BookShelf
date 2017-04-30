@@ -33,38 +33,31 @@ import java.util.List;
 import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 import static android.support.v4.media.session.MediaButtonReceiver.handleIntent;
 
-public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<List<Books>> {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Books>> {
 
-    private static String USGS_REQUEST_URL ="https://www.googleapis.com/books/v1/volumes?q=android&maxResults=10";
-
+    private static String USGS_REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=android&maxResults=10";
     private static final int BOOK_LOADER_ID = 1;
-
-
     public static final String LOG_TAG = MainActivity.class.getName();
     private BookAdapter mAdapter;
-
-
-
-    /** TextView that is displayed when the list is empty */
+    /**
+     * TextView that is displayed when the list is empty
+     */
     private TextView mEmptyStateTextView;
 
     public MainActivity() throws UnsupportedEncodingException {
     }
 
-
     @Override
     public Loader<List<Books>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
-        Log.v(LOG_TAG,"TEST: Create Loader Called");
+        Log.v(LOG_TAG, "TEST: Create Loader Called");
         return new BookLoader(this, USGS_REQUEST_URL);
     }
+
     @Override
     public void onLoadFinished(Loader<List<Books>> loader, List<Books> books) {
         View progressBar = findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
-
-
-
 
 
         // If there is a valid list of {@link Books}s, then add them to the adapter's
@@ -74,20 +67,16 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
         }
         // Set empty state text to display "No books found."
         mEmptyStateTextView.setText(R.string.no_books);
-        Log.v(LOG_TAG,"TEST: Finished Loader Called");
-        // Clear the adapter of previous book data
-        books.clear();
-
-
-
+        Log.v(LOG_TAG, "TEST: Finished Loader Called");
+        USGS_REQUEST_URL.replaceAll(" ", "%20");
     }
+
     @Override
     public void onLoaderReset(Loader<List<Books>> loader) {
-        Log.v(LOG_TAG,"TEST: Reset Loader Called");
+        Log.v(LOG_TAG, "TEST: Reset Loader Called");
         // Loader reset, so we can clear out our existing data.
         mAdapter.clear();
     }
-
 
 
     @Override
@@ -118,17 +107,12 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 mAdapter.clear();
-                setContentView(R.layout.activity_main);
-                // Find a reference to the {@link ListView} in the layout
-                final ListView bookListView = (ListView) findViewById(R.id.list);
-
-                // Set the adapter on the {@link ListView}
-                // so the list can be populated in the user interface
-                bookListView.setAdapter(mAdapter);
+                View loadingIndicator = findViewById(R.id.progress_bar);
+                loadingIndicator.setVisibility(View.VISIBLE);
 
 
                 Log.v("EditText", txt.getText().toString());
-               String searchWord = txt.getText().toString();
+                String searchWord = txt.getText().toString();
                 USGS_REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=" + searchWord + "&maxResults=10";
 
                 if (networkInfo != null && networkInfo.isConnected()) {
@@ -140,11 +124,10 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
                         getLoaderManager().restartLoader(0, null, MainActivity.this);
                     }
                 } else {
-                    View loadingIndicator = findViewById(R.id.progress_bar);
                     loadingIndicator.setVisibility(View.GONE);
 
                     TextView emptyText = (TextView) findViewById(R.id.empty_view);
-                    emptyText.setText("no_internet_connection");
+                    emptyText.setText(R.string.no_internet);
 
                 }
 
@@ -171,8 +154,8 @@ public class MainActivity  extends AppCompatActivity implements LoaderCallbacks<
             loadingIndicator.setVisibility(View.GONE);
 
             // Update empty state with no connection error message
-            mEmptyStateTextView.setText(R.string.no_internet);}
-
+            mEmptyStateTextView.setText(R.string.no_internet);
+        }
 
 
     }
