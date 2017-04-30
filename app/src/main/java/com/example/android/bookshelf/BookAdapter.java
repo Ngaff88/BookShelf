@@ -56,10 +56,6 @@ class BookAdapter extends ArrayAdapter<Books> {
         // Get the {@link Books} object located at this position in the list
         Books currentBook = getItem(position);
 
-        TextView rateTextView = (TextView) listItemView.findViewById(R.id.rating);
-        DecimalFormat formatter = new DecimalFormat("0.0");
-        String output = formatter.format(currentBook.getRating());
-        rateTextView.setText(String.valueOf(output));
 
         String author = currentBook.getAuthor();
         TextView authorTextView = (TextView) listItemView.findViewById(R.id.author);

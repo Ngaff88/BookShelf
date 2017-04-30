@@ -125,8 +125,6 @@ public class QueryUtils {
                 // for that book.
                 JSONObject properties = currentBook.getJSONObject("volumeInfo");
 
-                double rating = properties.getDouble("averageRating");
-                Log.d(LOG_TAG,"grabbed Rating");
 
                 // Extract the value for the key called "title"
                 String title = properties.getString("title");
@@ -140,7 +138,7 @@ public class QueryUtils {
 
 
                 // Create a new {@link Books} object with the title, authors and url from the JSON response.
-                Books bookItems = new Books(title, author, rating);
+                Books bookItems = new Books(title, author);
 
                 // Add the new {@link Books} to the list of books.
                 books.add(bookItems);

@@ -13,7 +13,6 @@ public class Books {
 
     private  String mAuthor;
 
-    private double mRating;
 
 
 
@@ -22,13 +21,11 @@ public class Books {
     *
     * @param Title is the name of the Books Title
     * @param Author is the corresponding author of the book
-    * @param Url is the url picked up from the JSON
-    * */
-    public Books(String title,String author,double rating )
+    */
+    public Books(String title,String author)
     {
         mTitle = title;
         mAuthor = author;
-        mRating = rating;
     }
 
     /**
@@ -47,12 +44,5 @@ public class Books {
      */
     public String getAuthor() {
         return mAuthor;
-    }
-
-    /**
-     * Get the url of the book
-     */
-    public double getRating() {
-        return mRating;
     }
 }
