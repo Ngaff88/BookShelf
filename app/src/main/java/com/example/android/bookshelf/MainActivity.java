@@ -58,6 +58,11 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onLoadFinished(Loader<List<Books>> loader, List<Books> books) {
         View progressBar = findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
 
 
         // If there is a valid list of {@link Books}s, then add them to the adapter's
@@ -69,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         mEmptyStateTextView.setText(R.string.no_books);
         Log.v(LOG_TAG, "TEST: Finished Loader Called");
         USGS_REQUEST_URL.replaceAll(" ", "%20");
+        if (!isConnected) {
+            mEmptyStateTextView.setText(R.string.no_internet);
+        }
     }
 
     @Override
@@ -83,7 +91,13 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Get a reference to the ConnectivityManager to check state of network connectivity
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // Get details on the currently active default data network
+        final NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
+        Button btn = (Button) findViewById(R.id.search_button);
+        final EditText txt = (EditText) findViewById(R.id.search);
 
         // Find a reference to the {@link ListView} in the layout
         final ListView bookListView = (ListView) findViewById(R.id.list);
@@ -95,13 +109,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         // so the list can be populated in the user interface
         bookListView.setAdapter(mAdapter);
 
-        // Get a reference to the ConnectivityManager to check state of network connectivity
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        // Get details on the currently active default data network
-        final NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-
-        Button btn = (Button) findViewById(R.id.search_button);
-        final EditText txt = (EditText) findViewById(R.id.search);
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                 String searchWord = txt.getText().toString();
                 USGS_REQUEST_URL = "https://www.googleapis.com/books/v1/volumes?q=" + searchWord + "&maxResults=10";
 
-                if (networkInfo != null && networkInfo.isConnected()) {
+                if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
                     LoaderManager loaderManager = getLoaderManager();
                     loaderManager.initLoader(0, null, MainActivity.this);
 
@@ -125,10 +132,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                     }
                 } else {
                     loadingIndicator.setVisibility(View.GONE);
-
-                    TextView emptyText = (TextView) findViewById(R.id.empty_view);
-                    emptyText.setText(R.string.no_internet);
-
+                    mEmptyStateTextView.setText(R.string.no_internet);
                 }
 
             }
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
 
         // If there is a network connection, fetch data
-        if (networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
             // Get a reference to the LoaderManager, in order to interact with loaders.
             LoaderManager loaderManager = getLoaderManager();
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
